@@ -1,0 +1,51 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                        http://www.springframework.org/schema/jdbc
+                        http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd">
+
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location">
+			<value>database.properties</value>
+		</property>
+	</bean>
+
+	<!-- <bean id="dataSource" destroy-method="close" -->
+	<!-- class="org.apache.commons.dbcp.BasicDataSource"> -->
+	<!-- <property name="driverClassName" value="${jdbc.driverClassName}" /> -->
+	<!-- <property name="url" value="${jdbc.url}" /> -->
+	<!-- <property name="username" value="${jdbc.username}" /> -->
+	<!-- <property name="password" value="${jdbc.password}" /> -->
+	<!-- <property name="initialSize" value="30" /> -->
+	<!-- </bean> -->
+
+	<!-- <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" 
+		destroy-method="close"> -->
+	<!-- <property name="driverClass" value="${jdbc.driverClassName}" /> -->
+	<!-- <property name="jdbcUrl" value="${jdbc.url}" /> -->
+	<!-- <property name="user" value="${jdbc.username}" /> -->
+	<!-- <property name="password" value="${jdbc.password}" /> -->
+	<!-- <property name="maxPoolSize" value="${jdbc.maxPoolSize}" /> -->
+	<!-- <property name="minPoolSize" value="${jdbc.minPoolSize}" /> -->
+	<!-- <property name="maxStatements" value="${jdbc.maxStatements}" /> -->
+	<!-- </bean> -->
+
+	<bean id="dataSource" class="com.mystic.db.utils.EmbeddedMysqlDataSource" 
+		init-method="init" destroy-method="shutdown">
+		<property name="url" value="${db.jdbc.url}" />
+		<property name="driverClassName" value="${db.driver.class}" />
+		<property name="username" value="${db.user}" />
+		<property name="password" value="${db.pass}" />
+		<property name="deleteBeforeOpen" value="${db.delete.before}" />
+		<property name="deleteAfterClose" value="${db.delete.after}" />
+	</bean>
+
+	<!-- create tables and load test data -->
+	<jdbc:initialize-database data-source="dataSource"
+		ignore-failures="DROPS">
+		<jdbc:script location="classpath:sql/MySQL.sql" />
+	</jdbc:initialize-database>
+
+</beans>
