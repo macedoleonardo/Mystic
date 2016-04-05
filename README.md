@@ -20,3 +20,6 @@
     &nbsp;&nbsp;&nbsp;&nbsp;property name="endpoint" value="https://real_url.com" </br>
     &nbsp;&nbsp;&nbsp;&nbsp;property name="folder" value="some_folder" </br>
     /bean
+
+<h4>If you need some help ;)</h4>
+leo.unsta@gmail.com
