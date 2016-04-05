@@ -2,6 +2,7 @@
 
 - Embedded MySQL
 - Spring
+- Hibernate
 
 <h4>The Deafult Port is 1209</h4>
 - Property mystic.port
