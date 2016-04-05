@@ -21,5 +21,5 @@
     &nbsp;&nbsp;&nbsp;&nbsp;property name="folder" value="some_folder" </br>
     /bean
 
-<h4>If you need some help ;)</h4>
+<h4>If you need some help don't hesitate to contact me  ;)</h4>
 leo.unsta@gmail.com
