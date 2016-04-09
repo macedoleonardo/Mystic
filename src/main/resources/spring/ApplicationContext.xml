@@ -6,8 +6,8 @@ http://www.springframework.org/schema/context
 http://www.springframework.org/schema/context/spring-context-2.5.xsd"
 	default-lazy-init="true">
 
-	<import resource="../spring/DataSource.xml"/>
-	<import resource="../hibernate/Hibernate.xml" />
+<!-- 	<import resource="../spring/DataSource.xml"/> -->
+<!-- 	<import resource="../hibernate/Hibernate.xml" /> -->
 
 	<!-- Auto scan the components -->
 	<context:component-scan base-package="com.mystic" />

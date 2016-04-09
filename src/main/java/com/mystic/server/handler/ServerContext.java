@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.mystic.db.domain.Mock;
+import com.mystic.domain.Mock;
 import com.mystic.mocker.Mocker;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
@@ -33,7 +33,7 @@ public class ServerContext implements HttpHandler {
 	private static final Logger logger = Logger.getLogger(ServerContext.class.getName());
 
 	@Autowired
-	Mocker mapper;
+	Mocker mocker;
 
 	public void handle(final HttpExchange exchange) {
 
@@ -45,7 +45,7 @@ public class ServerContext implements HttpHandler {
 		default:
 			new Thread(new Runnable() {
 				public void run() {
-					response = mapper.getMock(uri, exchange.getRequestHeaders());
+					response = mocker.getMock(uri, exchange.getRequestHeaders());
 					final Headers headers = exchange.getResponseHeaders();
 					headers.set("Content-Type", String.format(response.getContentType() + "; charset=%s", StandardCharsets.UTF_8));
 					final byte[] rawResponseBody = response.getValue().getBytes(StandardCharsets.UTF_8);

@@ -4,22 +4,23 @@
 package com.mystic.jobs;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
+
 import lombok.Data;
 
-import org.apache.commons.io.FileUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import com.mystic.db.dao.IMockerDAO;
-import com.mystic.db.domain.Mock;
-import com.mystic.db.utils.MysticConfiguration;
+import com.mystic.domain.Mock;
+import com.mystic.utils.MysticConfiguration;
+import com.mystic.utils.ZipUtils;
 
 /**
  * @author lpdmacedo
@@ -31,29 +32,27 @@ import com.mystic.db.utils.MysticConfiguration;
 @Component("mysticJob")
 public class MysticJob {
 
-	private long initTime = 0;
-	private long endTime = 0;
-
-	private List<String> mocks = new ArrayList<String>();
-
+	private List<String> mocks;
+	private ObjectMapper objectMapper;
+	
 	@Autowired
 	private MysticConfiguration configuration;
-
+	
 	@Autowired
-	private IMockerDAO mockerDAO;
+	private ZipUtils zipUtils;
 
 	private static final Logger LOG = Logger.getLogger(MysticJob.class.getName());
+	
+	@PostConstruct
+	void init() {
+		mocks = new ArrayList<String>();
+		objectMapper = new ObjectMapper();
+	}
 
 	public void save(final Mock mock) {
 		new Thread(new Runnable() {
 			public void run() {
-				mockerDAO.save(mock);
-			}
-		}).start();
-
-		new Thread(new Runnable() {
-			public void run() {
-				saveInsertSQL(mock);
+				saveMock(mock);
 			}
 		}).start();
 	}
@@ -63,22 +62,24 @@ public class MysticJob {
 	 * 
 	 * @param next
 	 */
-	private void saveInsertSQL(final Mock mock) {
-		String query = "INSERT INTO MOCK VALUES ('{0}', '{1}', '{2}');";
-		query = query.replace("{0}", mock.getKey());
-		query = query.replace("{1}", mock.getValue());
-		query = query.replace("{2}", mock.getContentType());
-
-		try {
-			if (!existMock(query)) {
-				FileUtils.writeStringToFile(configuration.getData(), "\n", StandardCharsets.UTF_8, true);
-				FileUtils.writeStringToFile(configuration.getData(), query.replaceAll("\\s*[\\r\\n]+\\s*", "").trim(), StandardCharsets.UTF_8, true);
-				mocks.add(query);
-				LOG.log(Level.INFO, "[MysticJob][query : " + query.replace("\n", "") + "]"); 
-			}
-		} catch (IOException e) {
-			LOG.log(Level.SEVERE, "[MysticJob] Failed To Write New Insert SQL");
+	private void saveMock(final Mock mock) {
+		String query = objectToJson(mock);
+		
+		if (!existMock(query)) {
+			zipUtils.writeMockIntoZipFile(query.replaceAll("\\s*[\\r\\n]+\\s*", "").trim()); 
+			mocks.add(query);
+			LOG.log(Level.INFO, "[MysticJob][query : " + query + "]"); 
 		}
+	}
+
+	private String objectToJson(Mock mock) {
+		String query = null;
+		try {
+			query = objectMapper.writeValueAsString(mock);
+		} catch (IOException e) {
+			LOG.log(Level.SEVERE, "[MysticJob][Failed To Transform Object To JSON String]"); 
+		}
+		return query;
 	}
 
 	private boolean existMock(String query) {
