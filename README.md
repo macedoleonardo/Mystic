@@ -1,4 +1,4 @@
 # Mystic Mock Server
 
-- Embedded MySQL
+- Memory Map
 - Spring
