@@ -66,7 +66,7 @@ public class MysticJob {
 		String query = objectToJson(mock);
 		
 		if (!existMock(query)) {
-			zipUtils.writeMockIntoZipFile(query.replaceAll("\\s*[\\r\\n]+\\s*", "").trim()); 
+			zipUtils.writeMockIntoZipFile(query); 
 			mocks.add(query);
 			LOG.log(Level.INFO, "[MysticJob][query : " + query + "]"); 
 		}

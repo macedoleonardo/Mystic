@@ -21,4 +21,11 @@ public class MysticRunner {
 		context = new ClassPathXmlApplicationContext("spring/ApplicationContext.xml");
 		context.getBean("mysticServer");
 	}
+	
+	public static void main(String[] args) {
+		MysticRunner runner = new MysticRunner();
+		runner.setEndpoint("https://api.mercadolibre.com");
+		runner.setFolder("target/mystic");
+		runner.init();
+	}
 }

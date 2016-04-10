@@ -47,7 +47,7 @@ public class Mapper {
 			mock.setKey(uri); 
 			setBody();
 			setContentType();
-			mocks.put(uri, new String[]{mock.getContentType(), mock.getValue()});
+			mocks.put(uri, new String[]{mock.getValue(), mock.getContentType()});
 			saveNewMock(mock);
 		}
 		

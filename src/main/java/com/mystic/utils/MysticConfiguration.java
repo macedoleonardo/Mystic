@@ -54,6 +54,9 @@ public class MysticConfiguration {
 		if(stringBuilder.length() > 0) {
 			String[] lines = stringBuilder.toString().split("\\n");
 			for(String line : lines) {
+				if(line.contains("/sites/MLA/brands")) {
+					System.out.println(line);
+				}
 				mock = stringToObject(line);
 				data.put(mock.getKey(), new String[]{mock.getValue(), mock.getContentType()});
 			}

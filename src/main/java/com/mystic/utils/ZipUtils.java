@@ -1,17 +1,21 @@
 package com.mystic.utils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import javax.annotation.PostConstruct;
+
+import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
 import lombok.Data;
@@ -43,21 +47,19 @@ public class ZipUtils {
 	 * @return
 	 */
 	StringBuilder readZipFile() {
-		try {
-			ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(data));
-			ZipEntry entry = zipInputStream.getNextEntry();
-			while(entry != null) {
-				byte[] buf = new byte[(int) zipFile.entries().nextElement().getSize()];
-				int len = zipInputStream.read(buf);
-	            stringBuilder.append(new String(buf, 0, len));
-				entry = zipInputStream.getNextEntry();
-			} 
-			zipInputStream.close();
-		} catch (FileNotFoundException e) {
-			LOG.log(Level.SEVERE, "[ReadZip][File Not Found]");
-		} catch (IOException e) { 
-			LOG.log(Level.SEVERE, "[ReadZip][Failed To Read Zip File]");
-		}
+		Enumeration<? extends ZipEntry> entries = zipFile.entries();
+
+	    while(entries.hasMoreElements()){
+	        ZipEntry entry = entries.nextElement();
+	        try {
+				InputStream stream = zipFile.getInputStream(entry);
+				StringWriter writer = new StringWriter();
+				IOUtils.copy(stream, writer, StandardCharsets.UTF_8);
+				stringBuilder.append(writer.toString());
+			} catch (IOException e) {
+				LOG.log(Level.SEVERE, "[ReadZip][Failed To Read Zip File]");
+			}
+	    }
 		return stringBuilder;
 	}
 	

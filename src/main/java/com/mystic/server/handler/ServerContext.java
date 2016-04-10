@@ -47,7 +47,7 @@ public class ServerContext implements HttpHandler {
 				public void run() {
 					response = mocker.getMock(uri, exchange.getRequestHeaders());
 					final Headers headers = exchange.getResponseHeaders();
-					headers.set("Content-Type", String.format(response.getContentType() + "; charset=%s", StandardCharsets.UTF_8));
+					headers.set("Content-Type", String.format(response.getContentType()));
 					final byte[] rawResponseBody = response.getValue().getBytes(StandardCharsets.UTF_8);
 					try {
 						exchange.sendResponseHeaders(200, rawResponseBody.length);
