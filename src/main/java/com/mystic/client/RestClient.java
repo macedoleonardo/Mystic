@@ -51,7 +51,7 @@ public class RestClient {
 	/**
 	 * Basic Rest Client 
 	 * @param URI
-	 * @param mapHeader
+	 * @param headers
 	 * @return ResponseEntity<String>
 	 */
 	public ResponseEntity<String> resquest(String URI, Headers headers) {

@@ -1,13 +1,16 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:util="http://www.springframework.org/schema/util"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
 http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
 http://www.springframework.org/schema/context
-http://www.springframework.org/schema/context/spring-context-2.5.xsd"
-	default-lazy-init="true">
+http://www.springframework.org/schema/context/spring-context-2.5.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+	   default-lazy-init="true">
 
-<!-- 	<import resource="../spring/DataSource.xml"/> -->
-<!-- 	<import resource="../hibernate/Hibernate.xml" /> -->
+	<bean id="mocks" name="mocks" class="java.util.HashMap" scope="singleton" lazy-init="false" />
+
+	<bean id="objectMapper" name="objectMapper" class="org.codehaus.jackson.map.ObjectMapper" scope="singleton" />
 
 	<!-- Auto scan the components -->
 	<context:component-scan base-package="com.mystic" />

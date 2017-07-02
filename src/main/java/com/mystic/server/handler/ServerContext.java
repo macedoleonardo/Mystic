@@ -4,7 +4,11 @@
 package com.mystic.server.handler;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,22 +22,30 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
+import javax.annotation.PostConstruct;
+
 /**
  * @author Leo
  * 
  */
 
-@Scope("prototype")
+@Scope("singleton")
 @Component("serverContext")
 public class ServerContext implements HttpHandler {
 
+	ExecutorService handlePool;
 	private static final String ROOT_PATH = "/";
 	Mock response = null; 
 	
-	private static final Logger logger = Logger.getLogger(ServerContext.class.getName());
+	private static final Logger LOG = Logger.getLogger(ServerContext.class.getName());
 
 	@Autowired
-	Mocker mocker;
+	private Mocker mocker;
+
+	@PostConstruct
+	public void init() {
+		handlePool = Executors.newFixedThreadPool(20);
+	}
 
 	public void handle(final HttpExchange exchange) {
 
@@ -43,21 +55,24 @@ public class ServerContext implements HttpHandler {
 		case ROOT_PATH:
 			break;
 		default:
-			new Thread(new Runnable() {
+			handlePool.execute(new Runnable() {
+				@Override
 				public void run() {
 					response = mocker.getMock(uri, exchange.getRequestHeaders());
 					final Headers headers = exchange.getResponseHeaders();
-					headers.set("Content-Type", String.format(response.getContentType()));
-					final byte[] rawResponseBody = response.getValue().getBytes(StandardCharsets.UTF_8);
+					headers.putAll(response.getHeader());
+					final byte[] rawResponseBody = response.getBody().getBytes(StandardCharsets.UTF_8);
 					try {
-						exchange.sendResponseHeaders(200, rawResponseBody.length);
+						exchange.sendResponseHeaders(response.getStatusCode().value(), rawResponseBody.length);
 						exchange.getResponseBody().write(rawResponseBody);
+						Writer out = new OutputStreamWriter(exchange.getResponseBody(), StandardCharsets.UTF_8);
+						out.write(response.getBody());
 					} catch (IOException e) {
-						logger.log(Level.SEVERE, "[ServerContext] Failed To Get Exchange"); 
+						LOG.log(Level.SEVERE, "[ServerContext] Failed To Get Exchange");
 					}
 					exchange.close();
 				}
-			}).start();
+			});
 			break;
 		}
 	}
